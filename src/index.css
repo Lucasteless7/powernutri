@@ -744,3 +744,375 @@ a:hover {
   min-height: 80px;
   font-family: inherit;
 }
+
+/* ─── Formulário de 3 abas ───────────────────────────── */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.tabs-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-color);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { color: var(--primary); background: var(--primary-light); }
+.tab-btn-active { color: var(--primary) !important; font-weight: 700; }
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: transparent;
+  border-radius: 3px 3px 0 0;
+  transition: background 0.2s;
+}
+.tab-indicator.active { background: var(--primary); }
+
+.tab-content {
+  padding: 1.75rem 2rem;
+}
+
+.tabs-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-color);
+}
+
+.tab-progress {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ─── Input com sufixo (kg, cm, litros) ─────────────── */
+.input-suffix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-suffix-wrap .form-input {
+  padding-right: 3.5rem;
+  width: 100%;
+}
+
+.input-suffix {
+  position: absolute;
+  right: 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* IMC read-only */
+.imc-field {
+  background-color: var(--bg-color) !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  cursor: default;
+}
+
+/* ─── Badge inline em label ──────────────────────────── */
+.field-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 99px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* ─── Chips de multi-seleção ─────────────────────────── */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.chip-active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+/* ─── Radio buttons estilizados ──────────────────────── */
+.radio-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.radio-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.radio-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.radio-btn.radio-active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.radio-group-vertical { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.5rem; }
+
+.radio-btn-h {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.radio-btn-h:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.radio-btn-h.radio-active {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+}
+
+/* ─── Toggle (sim/não) ───────────────────────────────── */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.toggle {
+  width: 48px;
+  height: 26px;
+  border-radius: 99px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-on { background: var(--primary); }
+
+.toggle-knob {
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.toggle-on .toggle-knob { transform: translateX(22px); }
+
+.toggle-label {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+/* ─── Form row de 3 colunas ──────────────────────────── */
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ─── Botão Voltar ───────────────────────────────────── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+.btn-back:hover { color: var(--primary); }
+
+/* ─── Listagem de pacientes ──────────────────────────── */
+.paciente-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* ─── Perfil do paciente ─────────────────────────────── */
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.profile-avatar-lg {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.5rem;
+}
+
+.profile-badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--bg-color);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.badge-primary { background: var(--primary-light); color: var(--primary); border-color: transparent; }
+.badge-warn { background: #fef9c3; color: #854d0e; border-color: transparent; }
+.badge-error { background: #fee2e2; color: #991b1b; border-color: transparent; }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.profile-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.profile-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-light);
+}
+
+.info-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.info-item.full-width { grid-column: 1 / -1; }
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.badges-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.25rem; }
+
+.animate-spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
