@@ -5,7 +5,10 @@ const getHostName = (urlStr) => {
   if (!urlStr) return '';
   try {
     const match = urlStr.match(/@([^/]+)/);
-    return match ? match[1] : '';
+    if (!match) return '';
+    const host = match[1];
+    // A API HTTP do Neon exige que o primeiro subdomínio seja substituído por 'api.'
+    return host.replace(/^[^.]+\./, 'api.');
   } catch (e) {
     return '';
   }
