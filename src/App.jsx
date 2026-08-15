@@ -4,6 +4,7 @@ import { useSession } from './lib/auth';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
 import Dashboard from './pages/Dashboard';
+import Pacientes from './pages/Pacientes';
 import Layout from './components/Layout';
 
 // Componente para proteger rotas (Dashboard)
@@ -57,12 +58,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/pacientes" element={
-              <div>
-                <h1 className="dashboard-title">Pacientes</h1>
-                <p style={{ color: 'var(--text-muted)' }}>A tela de gerenciamento de pacientes será implementada aqui.</p>
-              </div>
-            } />
+            <Route path="/pacientes" element={<Pacientes />} />
           </Route>
         </Route>
       </Routes>
