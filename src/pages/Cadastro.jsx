@@ -36,18 +36,30 @@ export default function Cadastro() {
       });
 
       if (authError) {
-        setError(authError.message || 'Erro ao criar conta. Verifique os dados.');
-      } else if (data) {
-        // Here we ideally need to insert into `nutricionistas` table using our Data API
-        // For now, since Neon Auth creates the user in `auth` schema, we rely on RLS and a future backend route.
-        // Wait, since Neon Auth supports webhooks or we can use the Neon Serverless driver, 
-        // we'll leave it as a stub until a backend is defined. 
-        // Note: Em uma aplicação real sem backend, poderíamos usar GraphQL/PostgREST.
-        // Simulando que o nutricionista foi salvo
+        console.error('SignUp error:', authError);
+        const errorMsg = (authError.message || JSON.stringify(authError)).toLowerCase();
+        if (
+          errorMsg.includes('already exists') ||
+          errorMsg.includes('already registered') ||
+          errorMsg.includes('user_already_exists') ||
+          errorMsg.includes('duplicate') ||
+          authError.status === 422
+        ) {
+          setError('Este email já está cadastrado. Faça login ou utilize outro email.');
+        } else {
+          setError(authError.message || 'Erro ao criar conta. Verifique os dados fornecidos.');
+        }
+      } else {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError('Ocorreu um erro ao tentar criar a conta.');
+      console.error('SignUp exception:', err);
+      const msg = err?.message || '';
+      if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('duplicate')) {
+        setError('Este email já está cadastrado. Faça login ou utilize outro email.');
+      } else {
+        setError(msg || 'Ocorreu um erro ao tentar criar a conta.');
+      }
     } finally {
       setLoading(false);
     }

@@ -22,12 +22,26 @@ export default function Login() {
       });
 
       if (authError) {
-        setError(authError.message || 'Email ou senha incorretos.');
-      } else if (data) {
+        console.error('SignIn error:', authError);
+        const msg = (authError.message || '').toLowerCase();
+        if (
+          msg.includes('invalid email') ||
+          msg.includes('invalid password') ||
+          msg.includes('credentials') ||
+          msg.includes('user not found') ||
+          authError.status === 401 ||
+          authError.status === 400
+        ) {
+          setError('Email ou senha incorretos.');
+        } else {
+          setError(authError.message || 'Email ou senha incorretos.');
+        }
+      } else {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError('Ocorreu um erro ao tentar fazer login. Tente novamente mais tarde.');
+      console.error('SignIn exception:', err);
+      setError(err?.message || 'Ocorreu um erro ao tentar fazer login.');
     } finally {
       setLoading(false);
     }
