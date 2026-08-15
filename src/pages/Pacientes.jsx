@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
-  Users, Plus, Search, User, Calendar, AlertCircle, Loader2, ChevronRight
+  Users, Plus, Search, User, Calendar, AlertCircle, Loader2, ChevronRight, CheckCircle
 } from 'lucide-react';
 
 export default function Pacientes() {
   const { data: session } = useSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [busca, setBusca] = useState('');
+  const [showExcluido] = useState(searchParams.get('excluido') === '1');
   const userId = session?.user?.id;
 
   const carregarPacientes = useCallback(async () => {
@@ -73,6 +75,13 @@ export default function Pacientes() {
           <Plus size={18} /> Novo Paciente
         </button>
       </div>
+
+      {/* Alerta de exclusão */}
+      {showExcluido && (
+        <div className="alert alert-success" style={{ marginBottom: '1.5rem' }}>
+          <CheckCircle size={18} /> Paciente excluído com sucesso.
+        </div>
+      )}
 
       {/* Erro */}
       {erro && (

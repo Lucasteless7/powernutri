@@ -3,9 +3,11 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
-  ArrowLeft, User, Phone, Mail, Activity, Coffee,
-  AlertCircle, Loader2, CheckCircle
+  ArrowLeft, User, AlertCircle, Loader2, CheckCircle,
+  Trash2, TriangleAlert
 } from 'lucide-react';
+
+// ─── Sub-componentes ───────────────────────────────────────────────────────────
 
 function InfoItem({ label, value }) {
   if (!value && value !== 0) return null;
@@ -26,6 +28,73 @@ function Section({ title, children }) {
   );
 }
 
+// ─── Modal de Confirmação de Exclusão ─────────────────────────────────────────
+
+function ModalExclusao({ nomePaciente, onConfirmar, onCancelar, loading }) {
+  const [confirmacaoTexto, setConfirmacaoTexto] = useState('');
+  const confirmacaoCorreta = confirmacaoTexto.trim().toLowerCase() === 'excluir';
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-card modal-danger">
+        <div className="modal-header">
+          <div className="modal-danger-icon">
+            <TriangleAlert size={22} />
+          </div>
+          <h2 className="modal-title">Excluir paciente</h2>
+          <button className="btn-icon" onClick={onCancelar} disabled={loading}>
+            ✕
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <p className="modal-danger-text">
+            Você está prestes a excluir permanentemente o paciente{' '}
+            <strong>{nomePaciente}</strong>. Esta ação{' '}
+            <strong>não pode ser desfeita</strong> e todos os dados do paciente
+            serão perdidos.
+          </p>
+
+          <div className="form-group" style={{ marginTop: '1.25rem' }}>
+            <label className="form-label">
+              Para confirmar, digite <strong>excluir</strong> abaixo:
+            </label>
+            <input
+              className="form-input"
+              type="text"
+              value={confirmacaoTexto}
+              onChange={e => setConfirmacaoTexto(e.target.value)}
+              placeholder="excluir"
+              autoFocus
+            />
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={onCancelar}
+            disabled={loading}
+          >
+            Cancelar
+          </button>
+          <button
+            className="btn btn-danger btn-sm"
+            onClick={onConfirmar}
+            disabled={!confirmacaoCorreta || loading}
+          >
+            {loading
+              ? <><Loader2 size={16} className="animate-spin" /> Excluindo...</>
+              : <><Trash2 size={16} /> Excluir permanentemente</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Página principal ──────────────────────────────────────────────────────────
+
 export default function PerfilPaciente() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,6 +104,8 @@ export default function PerfilPaciente() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [showSucesso] = useState(searchParams.get('novo') === '1');
+  const [showModalExclusao, setShowModalExclusao] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
   const userId = session?.user?.id;
 
   const calcularIdade = (dataNasc) => {
@@ -80,14 +151,38 @@ export default function PerfilPaciente() {
 
   useEffect(() => { carregarPaciente(); }, [carregarPaciente]);
 
+  const handleExcluir = async () => {
+    if (!userId || !id) return;
+    try {
+      setExcluindo(true);
+      await runQueriesWithRLS(userId, [
+        sql`DELETE FROM public.pacientes WHERE id = ${id} AND nutricionista_id = ${userId}`
+      ]);
+      navigate('/pacientes?excluido=1');
+    } catch (err) {
+      console.error(err);
+      setErro('Erro ao excluir o paciente. Tente novamente.');
+      setShowModalExclusao(false);
+    } finally {
+      setExcluindo(false);
+    }
+  };
+
   if (loading) return (
-    <div className="loading-center"><Loader2 className="animate-spin" size={32} color="var(--primary)" /><span>Carregando...</span></div>
+    <div className="loading-center">
+      <Loader2 className="animate-spin" size={32} color="var(--primary)" />
+      <span>Carregando...</span>
+    </div>
   );
 
-  if (erro) return (
+  if (erro && !paciente) return (
     <div>
-      <button className="btn-back" onClick={() => navigate('/pacientes')}><ArrowLeft size={18} /> Pacientes</button>
-      <div className="alert alert-error" style={{ marginTop: '1rem' }}><AlertCircle size={18} /> {erro}</div>
+      <button className="btn-back" onClick={() => navigate('/pacientes')}>
+        <ArrowLeft size={18} /> Pacientes
+      </button>
+      <div className="alert alert-error" style={{ marginTop: '1rem' }}>
+        <AlertCircle size={18} /> {erro}
+      </div>
     </div>
   );
 
@@ -109,6 +204,13 @@ export default function PerfilPaciente() {
         </div>
       )}
 
+      {/* Erro inline (ex: após falha na exclusão) */}
+      {erro && paciente && (
+        <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>
+          <AlertCircle size={18} /> {erro}
+        </div>
+      )}
+
       {/* Cabeçalho */}
       <div className="page-header">
         <div>
@@ -119,6 +221,14 @@ export default function PerfilPaciente() {
             {paciente.nome}
           </h1>
         </div>
+
+        {/* Botão excluir */}
+        <button
+          className="btn btn-danger btn-sm"
+          onClick={() => setShowModalExclusao(true)}
+        >
+          <Trash2 size={16} /> Excluir Paciente
+        </button>
       </div>
 
       {/* Card de perfil */}
@@ -208,6 +318,16 @@ export default function PerfilPaciente() {
           <InfoItem label="Observações" value={paciente.observacoes} />
         </Section>
       </div>
+
+      {/* Modal de exclusão */}
+      {showModalExclusao && (
+        <ModalExclusao
+          nomePaciente={paciente.nome}
+          onConfirmar={handleExcluir}
+          onCancelar={() => setShowModalExclusao(false)}
+          loading={excluindo}
+        />
+      )}
     </div>
   );
 }

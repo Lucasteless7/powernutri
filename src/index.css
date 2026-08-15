@@ -1116,3 +1116,47 @@ a:hover {
 
 .animate-spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Botão Danger (excluir) ─────────────────────────── */
+.btn-danger {
+  background-color: var(--error);
+  color: #fff;
+  border: none;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.btn-danger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ─── Modal Danger ───────────────────────────────────── */
+.modal-danger {
+  border-top: 4px solid var(--error);
+}
+
+.modal-danger-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #fee2e2;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-danger-text {
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modal-danger-text strong {
+  color: var(--error);
+}
