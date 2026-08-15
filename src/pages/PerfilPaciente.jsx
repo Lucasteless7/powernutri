@@ -149,7 +149,7 @@ export default function PerfilPaciente() {
     } finally {
       setLoading(false);
     }
-  }, [userId, id]);
+  }, [activeUserId, id]);
 
   useEffect(() => { carregarPaciente(); }, [carregarPaciente]);
 
