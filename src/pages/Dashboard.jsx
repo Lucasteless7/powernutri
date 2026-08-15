@@ -56,7 +56,11 @@ export default function Dashboard() {
         });
       } catch (err) {
         console.error('Error fetching dashboard statistics:', err);
-        setError('Ocorreu um erro ao carregar os dados do painel.');
+        if (err?.message?.includes('CONFIG_ERROR')) {
+          setError('A variável de ambiente VITE_NEON_DATABASE_URL não está configurada no painel do Vercel.');
+        } else {
+          setError('Ocorreu um erro ao carregar os dados do painel. Verifique a conexão com o banco de dados.');
+        }
       } finally {
         setLoading(false);
       }

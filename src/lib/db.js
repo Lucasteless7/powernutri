@@ -2,6 +2,7 @@ const DB_URL = import.meta.env.VITE_NEON_DATABASE_URL;
 
 // Extrai o hostname da string de conexão do Neon
 const getHostName = (urlStr) => {
+  if (!urlStr) return '';
   try {
     const match = urlStr.match(/@([^/]+)/);
     return match ? match[1] : '';
@@ -11,7 +12,7 @@ const getHostName = (urlStr) => {
 };
 
 const DB_HOST = getHostName(DB_URL);
-const SQL_ENDPOINT = `https://${DB_HOST}/sql`;
+const SQL_ENDPOINT = DB_HOST ? `https://${DB_HOST}/sql` : '';
 
 /**
  * Função de tag template para construir consultas parametrizadas.
@@ -41,6 +42,10 @@ export function sql(strings, ...values) {
  * @returns {Promise<Array>} Retorna um array com os resultados mapeados como objetos chave-valor
  */
 export async function runQueriesWithRLS(userId, queries) {
+  if (!DB_URL) {
+    throw new Error('CONFIG_ERROR: A variável de ambiente VITE_NEON_DATABASE_URL não está configurada no painel do Vercel.');
+  }
+
   if (!userId) {
     throw new Error('ID do usuário não fornecido para RLS.');
   }
