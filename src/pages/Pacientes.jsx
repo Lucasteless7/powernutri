@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useOutletContext } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
@@ -15,14 +15,15 @@ export default function Pacientes() {
   const [erro, setErro] = useState(null);
   const [busca, setBusca] = useState('');
   const [showExcluido] = useState(searchParams.get('excluido') === '1');
-  const userId = session?.user?.id;
+  const { role, selectedNutriId } = useOutletContext();
+  const activeUserId = role === 'personal' ? selectedNutriId : session?.user?.id;
 
   const carregarPacientes = useCallback(async () => {
-    if (!userId) return;
+    if (!activeUserId) return;
     try {
       setLoading(true);
       setErro(null);
-      const [rows] = await runQueriesWithRLS(userId, [
+      const [rows] = await runQueriesWithRLS(activeUserId, [
         sql`SELECT
               p.id,
               p.nome,
@@ -41,7 +42,7 @@ export default function Pacientes() {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [activeUserId]);
 
   useEffect(() => { carregarPacientes(); }, [carregarPacientes]);
 
@@ -71,9 +72,12 @@ export default function Pacientes() {
             {loading ? 'Carregando...' : `${pacientes.length} paciente${pacientes.length !== 1 ? 's' : ''} cadastrado${pacientes.length !== 1 ? 's' : ''}`}
           </p>
         </div>
-        <button className="btn btn-primary btn-sm" onClick={() => navigate('/pacientes/novo')}>
-          <Plus size={18} /> Novo Paciente
-        </button>
+        
+        {role !== 'personal' && (
+          <button className="btn btn-primary btn-sm" onClick={() => navigate('/pacientes/novo')}>
+            <Plus size={16} /> Novo Paciente
+          </button>
+        )}
       </div>
 
       {/* Alerta de exclusão */}

@@ -1,21 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useSession, signOut } from '../lib/auth';
-import { HeartPulse, LayoutDashboard, Users, LogOut } from 'lucide-react';
+import { sql, runQueriesWithRLS } from '../lib/db';
+import { HeartPulse, LayoutDashboard, Users, LogOut, Loader2 } from 'lucide-react';
 
 export default function Layout() {
   const { data: session } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [role, setRole] = useState(null);
+  const [selectedNutriId, setSelectedNutriId] = useState(localStorage.getItem('selectedNutriId') || null);
+  const [loadingRole, setLoadingRole] = useState(true);
+
+  const fetchRole = useCallback(async () => {
+    if (!session?.user?.id) return;
+    try {
+      const [rows] = await runQueriesWithRLS(session.user.id, [
+        sql`SELECT role FROM public.usuarios_perfis WHERE id = ${session.user.id} LIMIT 1`
+      ]);
+      if (rows && rows.length > 0) {
+        setRole(rows[0].role);
+      } else {
+        setRole('nutricionista'); // fallback
+      }
+    } catch (err) {
+      console.error('Erro ao buscar papel do usuário:', err);
+      setRole('nutricionista');
+    } finally {
+      setLoadingRole(false);
+    }
+  }, [session?.user?.id]);
+
+  useEffect(() => { fetchRole(); }, [fetchRole]);
+
+  useEffect(() => {
+    if (selectedNutriId) {
+      localStorage.setItem('selectedNutriId', selectedNutriId);
+    } else {
+      localStorage.removeItem('selectedNutriId');
+    }
+  }, [selectedNutriId]);
+
   const handleLogout = async () => {
     try {
       await signOut();
+      localStorage.removeItem('selectedNutriId');
       navigate('/login');
     } catch (err) {
       console.error('Logout error:', err);
     }
   };
+
+  if (loadingRole) {
+    return (
+      <div className="loading-center">
+        <Loader2 className="animate-spin" size={32} color="var(--primary)" />
+        <span>Carregando seu perfil...</span>
+      </div>
+    );
+  }
 
   const menuItems = [
     { path: '/dashboard', name: 'Dashboard', icon: LayoutDashboard },
@@ -28,7 +72,7 @@ export default function Layout() {
       <aside className="sidebar">
         <div className="sidebar-logo">
           <HeartPulse size={28} />
-          <span>PowerNutri</span>
+          <span>PowerNutri {role === 'personal' && <small style={{fontSize: '10px', display: 'block'}}>Personal</small>}</span>
         </div>
         <ul className="sidebar-menu">
           {menuItems.map((item) => {
@@ -50,7 +94,7 @@ export default function Layout() {
       <div className="main-content">
         <header className="app-header">
           <div className="header-user">
-            <span className="user-name">Olá, {session?.user?.name || 'Nutricionista'}</span>
+            <span className="user-name">Olá, {session?.user?.name || (role === 'personal' ? 'Personal' : 'Nutricionista')}</span>
             <button onClick={handleLogout} className="btn-logout">
               <LogOut size={18} />
               <span>Sair</span>
@@ -58,7 +102,7 @@ export default function Layout() {
           </div>
         </header>
         <main className="page-container">
-          <Outlet />
+          <Outlet context={{ role, selectedNutriId, setSelectedNutriId }} />
         </main>
       </div>
     </div>

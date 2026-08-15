@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
@@ -20,13 +20,14 @@ export default function RotinaTreino() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [erro, setErro] = useState(null);
-  const userId = session?.user?.id;
+  const { role, selectedNutriId } = useOutletContext();
+  const activeUserId = role === 'personal' ? selectedNutriId : session?.user?.id;
 
   const carregarDados = useCallback(async () => {
-    if (!userId || !id) return;
+    if (!activeUserId || !id) return;
     try {
       setLoading(true);
-      const [rows] = await runQueriesWithRLS(userId, [
+      const [rows] = await runQueriesWithRLS(activeUserId, [
         sql`SELECT id, nome, rotina_treino FROM public.pacientes WHERE id = ${id} LIMIT 1`
       ]);
       if (rows && rows.length > 0) {
@@ -41,16 +42,16 @@ export default function RotinaTreino() {
     } finally {
       setLoading(false);
     }
-  }, [userId, id]);
+  }, [activeUserId, id]);
 
   useEffect(() => { carregarDados(); }, [carregarDados]);
 
   const handleSalvar = async () => {
-    if (!userId || !id) return;
+    if (!activeUserId || !id) return;
     setSaving(true);
     setErro(null);
     try {
-      await runQueriesWithRLS(userId, [
+      await runQueriesWithRLS(activeUserId, [
         sql`UPDATE public.pacientes SET rotina_treino = ${JSON.stringify(rotina)} WHERE id = ${id}`
       ]);
       navigate(`/pacientes/${id}`);

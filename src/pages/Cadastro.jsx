@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeartPulse, AlertCircle, Loader2 } from 'lucide-react';
 import { signUp } from '../lib/auth';
+import { sql, runQueriesWithRLS } from '../lib/db';
 
 export default function Cadastro() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('nutricionista');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -50,6 +52,13 @@ export default function Cadastro() {
           setError(authError.message || 'Erro ao criar conta. Verifique os dados fornecidos.');
         }
       } else {
+        try {
+          await runQueriesWithRLS(data.user.id, [
+            sql`INSERT INTO public.usuarios_perfis (id, nome, role) VALUES (${data.user.id}, ${name}, ${role})`
+          ]);
+        } catch (dbErr) {
+          console.error('Erro ao salvar o perfil do usuário no banco:', dbErr);
+        }
         navigate('/dashboard');
       }
     } catch (err) {
@@ -74,7 +83,7 @@ export default function Cadastro() {
             PowerNutri
           </div>
           <h1 className="auth-title">Crie sua conta</h1>
-          <p className="auth-subtitle">Junte-se à plataforma completa para nutricionistas.</p>
+          <p className="auth-subtitle">Junte-se à plataforma completa para profissionais.</p>
         </div>
 
         {error && (
@@ -85,6 +94,35 @@ export default function Cadastro() {
         )}
 
         <form onSubmit={handleCadastro}>
+          
+          <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+            <label className="form-label">Qual é o seu perfil?</label>
+            <div className="radio-group">
+              <label className={`radio-btn ${role === 'nutricionista' ? 'radio-active' : ''}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="nutricionista"
+                  checked={role === 'nutricionista'}
+                  onChange={() => setRole('nutricionista')}
+                  style={{ display: 'none' }}
+                />
+                Nutricionista
+              </label>
+              <label className={`radio-btn ${role === 'personal' ? 'radio-active' : ''}`}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="personal"
+                  checked={role === 'personal'}
+                  onChange={() => setRole('personal')}
+                  style={{ display: 'none' }}
+                />
+                Personal Trainer
+              </label>
+            </div>
+          </div>
+
           <div className="form-group">
             <label className="form-label" htmlFor="name">Nome completo</label>
             <input

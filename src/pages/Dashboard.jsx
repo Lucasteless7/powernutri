@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import { Users, Calendar, AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
+import DashboardPersonal from './DashboardPersonal';
 
-export default function Dashboard() {
+function DashboardNutricionista() {
   const { data: session } = useSession();
   const [stats, setStats] = useState({
     totalPacientes: 0,
@@ -71,7 +72,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="dashboard-title">Dashboard</h1>
+      <h1 className="dashboard-title">Dashboard do Nutricionista</h1>
       
       {error && (
         <div className="alert alert-error">
@@ -136,4 +137,14 @@ export default function Dashboard() {
       )}
     </div>
   );
+}
+
+export default function Dashboard() {
+  const { role } = useOutletContext();
+  
+  if (role === 'personal') {
+    return <DashboardPersonal />;
+  }
+
+  return <DashboardNutricionista />;
 }

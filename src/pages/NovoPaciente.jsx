@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
@@ -108,6 +108,16 @@ export default function NovoPaciente() {
   const [form, setForm] = useState(FORM_INICIAL);
   const [saving, setSaving] = useState(false);
   const [erro, setErro] = useState(null);
+
+  const { role } = useOutletContext();
+
+  if (role === 'personal') {
+    return (
+      <div className="alert alert-error">
+        Acesso negado. Apenas nutricionistas podem criar pacientes.
+      </div>
+    );
+  }
 
   const userId = session?.user?.id;
   const imc = calcularIMC(form.peso_inicial, form.altura);

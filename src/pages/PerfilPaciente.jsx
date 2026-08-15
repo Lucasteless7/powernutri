@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useOutletContext } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
@@ -107,7 +107,8 @@ export default function PerfilPaciente() {
   const [showSucesso] = useState(searchParams.get('novo') === '1');
   const [showModalExclusao, setShowModalExclusao] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
-  const userId = session?.user?.id;
+  const { role, selectedNutriId } = useOutletContext();
+  const activeUserId = role === 'personal' ? selectedNutriId : session?.user?.id;
 
   const calcularIdade = (dataNasc) => {
     if (!dataNasc) return null;
@@ -133,11 +134,11 @@ export default function PerfilPaciente() {
   };
 
   const carregarPaciente = useCallback(async () => {
-    if (!userId || !id) return;
+    if (!activeUserId || !id) return;
     try {
       setLoading(true);
       setErro(null);
-      const [rows] = await runQueriesWithRLS(userId, [
+      const [rows] = await runQueriesWithRLS(activeUserId, [
         sql`SELECT * FROM public.pacientes WHERE id = ${id} LIMIT 1`
       ]);
       if (rows && rows.length > 0) setPaciente(rows[0]);
@@ -153,11 +154,11 @@ export default function PerfilPaciente() {
   useEffect(() => { carregarPaciente(); }, [carregarPaciente]);
 
   const handleExcluir = async () => {
-    if (!userId || !id) return;
+    if (!activeUserId || !id) return;
     try {
       setExcluindo(true);
-      await runQueriesWithRLS(userId, [
-        sql`DELETE FROM public.pacientes WHERE id = ${id} AND nutricionista_id = ${userId}`
+      await runQueriesWithRLS(activeUserId, [
+        sql`DELETE FROM public.pacientes WHERE id = ${id} AND nutricionista_id = ${activeUserId}`
       ]);
       navigate('/pacientes?excluido=1');
     } catch (err) {
@@ -227,9 +228,11 @@ export default function PerfilPaciente() {
           <button className="btn btn-primary btn-sm" onClick={() => navigate(`/pacientes/${id}/treino`)}>
             <Dumbbell size={16} /> Rotina de Treino
           </button>
-          <button className="btn btn-danger btn-sm" onClick={() => setShowModalExclusao(true)}>
-            <Trash2 size={16} /> Excluir Paciente
-          </button>
+          {role !== 'personal' && (
+            <button className="btn btn-danger btn-sm" onClick={() => setShowModalExclusao(true)}>
+              <Trash2 size={16} /> Excluir Paciente
+            </button>
+          )}
         </div>
       </div>
 
