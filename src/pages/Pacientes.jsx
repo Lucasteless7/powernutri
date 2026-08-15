@@ -32,6 +32,7 @@ export default function Pacientes() {
               MAX(c.data_consulta)::text AS ultima_consulta
             FROM public.pacientes p
             LEFT JOIN public.consultas c ON c.paciente_id = p.id
+            WHERE p.nutricionista_id = ${activeUserId}
             GROUP BY p.id, p.nome, p.objetivo_texto, p.objetivos, p.created_at
             ORDER BY p.created_at DESC;`
       ]);

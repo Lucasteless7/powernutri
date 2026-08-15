@@ -139,7 +139,7 @@ export default function PerfilPaciente() {
       setLoading(true);
       setErro(null);
       const [rows] = await runQueriesWithRLS(activeUserId, [
-        sql`SELECT * FROM public.pacientes WHERE id = ${id} LIMIT 1`
+        sql`SELECT * FROM public.pacientes WHERE id = ${id} AND nutricionista_id = ${activeUserId} LIMIT 1`
       ]);
       if (rows && rows.length > 0) setPaciente(rows[0]);
       else setErro('Paciente não encontrado.');

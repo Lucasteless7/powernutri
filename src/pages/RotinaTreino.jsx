@@ -28,7 +28,7 @@ export default function RotinaTreino() {
     try {
       setLoading(true);
       const [rows] = await runQueriesWithRLS(activeUserId, [
-        sql`SELECT id, nome, rotina_treino FROM public.pacientes WHERE id = ${id} LIMIT 1`
+        sql`SELECT id, nome, rotina_treino FROM public.pacientes WHERE id = ${id} AND nutricionista_id = ${activeUserId} LIMIT 1`
       ]);
       if (rows && rows.length > 0) {
         setPaciente(rows[0]);
@@ -52,7 +52,7 @@ export default function RotinaTreino() {
     setErro(null);
     try {
       await runQueriesWithRLS(activeUserId, [
-        sql`UPDATE public.pacientes SET rotina_treino = ${JSON.stringify(rotina)} WHERE id = ${id}`
+        sql`UPDATE public.pacientes SET rotina_treino = ${JSON.stringify(rotina)} WHERE id = ${id} AND nutricionista_id = ${activeUserId}`
       ]);
       navigate(`/pacientes/${id}`);
     } catch (err) {

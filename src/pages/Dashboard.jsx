@@ -24,17 +24,20 @@ function DashboardNutricionista() {
         setError(null);
 
         const queries = [
-          sql`SELECT COUNT(*)::integer as count FROM public.pacientes;`,
+          sql`SELECT COUNT(*)::integer as count FROM public.pacientes WHERE nutricionista_id = ${session.user.id};`,
           sql`
             SELECT COUNT(*)::integer as count 
-            FROM public.consultas 
-            WHERE data_consulta >= date_trunc('week', current_date)::date 
-              AND data_consulta <= (date_trunc('week', current_date) + interval '6 days')::date;
+            FROM public.consultas c
+            JOIN public.pacientes p ON p.id = c.paciente_id
+            WHERE c.data_consulta >= date_trunc('week', current_date)::date 
+              AND c.data_consulta <= (date_trunc('week', current_date) + interval '6 days')::date
+              AND p.nutricionista_id = ${session.user.id};
           `,
           sql`
             SELECT p.id, p.nome 
             FROM public.pacientes p
             JOIN public.consultas c ON c.paciente_id = p.id
+            WHERE p.nutricionista_id = ${session.user.id}
             GROUP BY p.id, p.nome
             HAVING MAX(c.data_consulta) < CURRENT_DATE - 30
                AND NOT EXISTS (
