@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Pacientes from './pages/Pacientes';
 import NovoPaciente from './pages/NovoPaciente';
 import PerfilPaciente from './pages/PerfilPaciente';
+import RotinaTreino from './pages/RotinaTreino';
 import Layout from './components/Layout';
 
 // Componente para proteger rotas (Dashboard)
@@ -63,6 +64,7 @@ function App() {
             <Route path="/pacientes" element={<Pacientes />} />
             <Route path="/pacientes/novo" element={<NovoPaciente />} />
             <Route path="/pacientes/:id" element={<PerfilPaciente />} />
+            <Route path="/pacientes/:id/treino" element={<RotinaTreino />} />
           </Route>
         </Route>
       </Routes>

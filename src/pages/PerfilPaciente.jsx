@@ -3,8 +3,9 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSession } from '../lib/auth';
 import { sql, runQueriesWithRLS } from '../lib/db';
 import {
-  ArrowLeft, User, AlertCircle, Loader2, CheckCircle,
-  Trash2, TriangleAlert
+  ArrowLeft, User, Phone, Mail, Activity, Coffee,
+  AlertCircle, Loader2, CheckCircle,
+  Trash2, TriangleAlert, Dumbbell
 } from 'lucide-react';
 
 // ─── Sub-componentes ───────────────────────────────────────────────────────────
@@ -222,13 +223,14 @@ export default function PerfilPaciente() {
           </h1>
         </div>
 
-        {/* Botão excluir */}
-        <button
-          className="btn btn-danger btn-sm"
-          onClick={() => setShowModalExclusao(true)}
-        >
-          <Trash2 size={16} /> Excluir Paciente
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button className="btn btn-primary btn-sm" onClick={() => navigate(`/pacientes/${id}/treino`)}>
+            <Dumbbell size={16} /> Rotina de Treino
+          </button>
+          <button className="btn btn-danger btn-sm" onClick={() => setShowModalExclusao(true)}>
+            <Trash2 size={16} /> Excluir Paciente
+          </button>
+        </div>
       </div>
 
       {/* Card de perfil */}
